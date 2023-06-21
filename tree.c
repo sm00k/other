@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define DEBUG_PRINT 0
+
 struct node{
   int val;
   unsigned char height;
@@ -33,33 +35,11 @@ void small_left_round(struct node **head)
   (*head)->left = tmp;
 }
 
-void big_left_round(struct node **head)
-{
-  struct node *tmp;
-  tmp = *head;
-  *head = (*head)->right->left;
-  tmp->right->left = (*head)->right;
-  (*head)->right = tmp->right;
-  tmp->right = (*head)->left;
-  (*head)->left = tmp;
-}
-
 void small_right_round(struct node **head)
 {
   struct node *tmp;
   tmp = *head;
   *head = (*head)->left;
-  tmp->left = (*head)->right;
-  (*head)->right = tmp;
-}
-
-void big_right_round(struct node **head)
-{
-  struct node *tmp;
-  tmp = *head;
-  *head = (*head)->left->right;
-  tmp->left->right = (*head)->left;
-  (*head)->left = tmp->left;
   tmp->left = (*head)->right;
   (*head)->right = tmp;
 }
@@ -122,12 +102,16 @@ void search_tree(struct node *head, int s_key)
     }
   if(s_key < head->val)
     {
+      #if DEBUG_PRINT
       printf("%d\n", head->val);
+      #endif
       search_tree(head->left, s_key);
     }
   if(s_key > head->val)
     {
+      #if DEBUG_PRINT
       printf("%d\n", head->val);
+      #endif
       search_tree(head->right, s_key);
     }
 }
@@ -170,7 +154,9 @@ int main(int argc, char **argv)
 	}
     }
   free(buf);
-  search_tree(head, 39);
+  search_tree(head, atoi(argv[2]));
+  #if DEBUG_PRINT
   printf("%s %d\n", "height: ", head->height);
+  #endif
   return 0;
 }
