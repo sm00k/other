@@ -44,76 +44,58 @@ void small_right_round(struct node **head)
   (*head)->right = tmp;
 }
 
-void add_tree(struct node **head, int val)
+void balance(struct node **head)
 {
-  if(!*head)
-    {
-      *head = malloc(sizeof(**head));
-      (*head)->val = val;
-      (*head)->height = 1;
-      (*head)->left = NULL;
-      (*head)->right = NULL;
-      return;
-    }
-  if((*head)->val == val)
-    return;
-  if(val < (*head)->val)
-    add_tree(&(*head)->left, val);
-  else
-    add_tree(&(*head)->right, val);
-  fixheight(&(*head));
-  if(bfactor(*head) == 2)
+    if(bfactor(*head) == 2)
     {
       if(bfactor((*head)->right) < 0)
 	small_right_round(&(*head)->right);
-      small_left_round(&(*head));
-      return;
+      small_left_round(&(*head));;
     }
   if(bfactor(*head) == -2)
     {
       if(bfactor((*head)->left) > 0)
 	small_left_round(&(*head)->left);
       small_right_round(&(*head));
-      return;
     }
 }
+
+struct node *node_create(int s_key)
+{
+  struct node *new_node;
+  new_node = malloc(sizeof(new_node));
+  new_node->val = s_key;
+  new_node->height = 1;
+  new_node->left = NULL;
+  new_node->rigth = NULL;
+  return new_node;
+}
+
+void extract(struct node **from, struct node *whither)
+{
+  *whither = *from;
   
 
-void print_tree(struct node *head)
+void node_search(struct node **head, int s_key, struct node **extracted)
 {
-  if(!head)
-    return;
-  print_tree(head->left);
-  printf("%d\n", head->val);
-  print_tree(head->right);
-}
-
-void search_tree(struct node *head, int s_key)
-{
-  if(!head)
+  if(!*head)
     {
-      printf("%s\n", "search value is not tree");
+      if(!*extracted)
+	*head = node_create(s_key);
       return;
     }
-  if(head->val == s_key)
+  if(s_key == (*head)->val)
     {
-      printf("%d\n", head->val);
+      if(*extracted)
+	extract(&(*head), &(*extracted));
       return;
     }
-  if(s_key < head->val)
-    {
-      #if DEBUG_PRINT
-      printf("%d\n", head->val);
-      #endif
-      search_tree(head->left, s_key);
-    }
-  if(s_key > head->val)
-    {
-      #if DEBUG_PRINT
-      printf("%d\n", head->val);
-      #endif
-      search_tree(head->right, s_key);
-    }
+  if(s_key < (*head)->val)
+    search_tree(&(*head)->left, s_key, &(*extracted));
+  else
+    search_tree(&(*head)->right, s_key, &(*extracted));
+  fixheight(&(*head));
+  balance(&(*head));
 }
 
 int main(int argc, char **argv)
@@ -155,8 +137,5 @@ int main(int argc, char **argv)
     }
   free(buf);
   search_tree(head, atoi(argv[2]));
-  #if DEBUG_PRINT
-  printf("%s %d\n", "height: ", head->height);
-  #endif
   return 0;
 }
